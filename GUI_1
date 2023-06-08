@@ -1,0 +1,148 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+class Meal {
+    private String name;
+    private double calories;
+
+    public Meal(String name, double calories) {
+        this.name = name;
+        this.calories = calories;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getCalories() {
+        return calories;
+    }
+}
+
+public class DietManagementApp {
+    private List<Meal> meals = new ArrayList<>();
+
+    private JFrame frame;
+    private JTextField mealNameField;
+    private JTextField caloriesField;
+    private JTextArea dietPlanTextArea;
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new DietManagementApp().createAndShowGUI();
+            }
+        });
+    }
+
+    private void createAndShowGUI() {
+        frame = new JFrame("Diet Management App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
+
+        // Create panels
+        JPanel inputPanel = createInputPanel();
+        JPanel dietPlanPanel = createDietPlanPanel();
+
+        // Add panels to the frame
+        frame.getContentPane().add(inputPanel, BorderLayout.NORTH);
+        frame.getContentPane().add(dietPlanPanel, BorderLayout.CENTER);
+
+        frame.setVisible(true);
+    }
+
+    private JPanel createInputPanel() {
+        JPanel inputPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(10, 10, 10, 10);
+
+        JLabel mealNameLabel = new JLabel("Meal Name:");
+        mealNameField = new JTextField(10);
+
+        JLabel caloriesLabel = new JLabel("Calories:");
+        caloriesField = new JTextField(10);
+
+        JButton addButton = new JButton("Add Meal");
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addMeal();
+            }
+        });
+
+        c.gridx = 0;
+        c.gridy = 0;
+        inputPanel.add(mealNameLabel, c);
+
+        c.gridx = 1;
+        c.gridy = 0;
+        inputPanel.add(mealNameField, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        inputPanel.add(caloriesLabel, c);
+
+        c.gridx = 1;
+        c.gridy = 1;
+        inputPanel.add(caloriesField, c);
+
+        c.gridx = 1;
+        c.gridy = 2;
+        inputPanel.add(addButton, c);
+
+        return inputPanel;
+    }
+
+    private JPanel createDietPlanPanel() {
+        JPanel dietPlanPanel = new JPanel(new BorderLayout());
+        dietPlanTextArea = new JTextArea(10, 30);
+        dietPlanTextArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(dietPlanTextArea);
+        dietPlanPanel.add(scrollPane, BorderLayout.CENTER);
+        return dietPlanPanel;
+    }
+
+    private void addMeal() {
+        String mealName = mealNameField.getText();
+        String caloriesText = caloriesField.getText();
+
+        if (mealName.isEmpty() || caloriesText.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Please enter meal name and calories.");
+            return;
+        }
+
+        try {
+            double calories = Double.parseDouble(caloriesText);
+            Meal meal = new Meal(mealName, calories);
+            meals.add(meal);
+            updateDietPlanTextArea();
+            clearInputFields();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(frame, "Invalid calories value. Please enter a valid number.");
+        }
+    }
+
+    private void updateDietPlanTextArea() {
+        StringBuilder sb = new StringBuilder();
+
+        if (meals.isEmpty()) {
+            sb.append("No meals found in the diet plan.");
+        } else {
+            for (Meal meal : meals) {
+                sb.append("Meal: ").append(meal.getName()).append("\n");
+                sb.append("Calories: ").append(meal.getCalories()).append("\n\n");
+            }
+        }
+
+        dietPlanTextArea.setText(sb.toString());
+    }
+
+    private void clearInputFields() {
+        mealNameField.setText("");
+        caloriesField.setText("");
+    }
+}
