@@ -1,0 +1,140 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Food {
+    private String name;
+    private double calories;
+
+    public Food(String name, double calories) {
+        this.name = name;
+        this.calories = calories;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getCalories() {
+        return calories;
+    }
+}
+
+class Meal {
+    private String name;
+    private List<Food> foods;
+
+    public Meal(String name) {
+        this.name = name;
+        this.foods = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Food> getFoods() {
+        return foods;
+    }
+
+    public void addFood(Food food) {
+        foods.add(food);
+    }
+}
+
+class DietPlan {
+    private List<Meal> meals;
+
+    public DietPlan() {
+        this.meals = new ArrayList<>();
+    }
+
+    public List<Meal> getMeals() {
+        return meals;
+    }
+
+    public void addMeal(Meal meal) {
+        meals.add(meal);
+    }
+}
+
+public class DietManagementApp {
+    private static Scanner scanner = new Scanner(System.in);
+    private static DietPlan dietPlan = new DietPlan();
+
+    public static void main(String[] args) {
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.println("1. Add Meal");
+            System.out.println("2. View Diet Plan");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addMeal();
+                    break;
+                case 2:
+                    viewDietPlan();
+                    break;
+                case 3:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+        scanner.close();
+    }
+
+    private static void addMeal() {
+        System.out.print("Enter meal name: ");
+        String mealName = scanner.next();
+        Meal meal = new Meal(mealName);
+
+        boolean addMoreFoods = true;
+
+        while (addMoreFoods) {
+            System.out.print("Enter food name: ");
+            String foodName = scanner.next();
+            System.out.print("Enter calories: ");
+            double calories = scanner.nextDouble();
+
+            Food food = new Food(foodName, calories);
+            meal.addFood(food);
+
+            System.out.print("Add more foods? (Y/N): ");
+            String choice = scanner.next();
+
+            if (choice.equalsIgnoreCase("N")) {
+                addMoreFoods = false;
+            }
+        }
+
+        dietPlan.addMeal(meal);
+        System.out.println("Meal added successfully!");
+    }
+
+    private static void viewDietPlan() {
+        System.out.println("\nDiet Plan:");
+        System.out.println("----------");
+
+        List<Meal> meals = dietPlan.getMeals();
+
+        for (Meal meal : meals) {
+            System.out.println(meal.getName() + ":");
+            System.out.println("Foods:");
+
+            List<Food> foods = meal.getFoods();
+
+            for (Food food : foods) {
+                System.out.println("- " + food.getName() + " (" + food.getCalories() + " calories)");
+            }
+
+            System.out.println();
+        }
+    }
+}
