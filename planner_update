@@ -1,0 +1,303 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Food {
+    private String name;
+    private double calories;
+
+    public Food(String name, double calories) {
+        this.name = name;
+        this.calories = calories;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getCalories() {
+        return calories;
+    }
+}
+
+class Meal {
+    private String name;
+    private List<Food> foods;
+
+    public Meal(String name) {
+        this.name = name;
+        this.foods = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Food> getFoods() {
+        return foods;
+    }
+
+    public void addFood(Food food) {
+        foods.add(food);
+    }
+
+    public void removeFood(Food food) {
+        foods.remove(food);
+    }
+}
+
+class DietPlan {
+    private List<Meal> meals;
+
+    public DietPlan() {
+        this.meals = new ArrayList<>();
+    }
+
+    public List<Meal> getMeals() {
+        return meals;
+    }
+
+    public void addMeal(Meal meal) {
+        meals.add(meal);
+    }
+
+    public void removeMeal(Meal meal) {
+        meals.remove(meal);
+    }
+
+    public double calculateTotalCalories() {
+        double totalCalories = 0;
+
+        for (Meal meal : meals) {
+            for (Food food : meal.getFoods()) {
+                totalCalories += food.getCalories();
+            }
+        }
+
+        return totalCalories;
+    }
+}
+
+public class DietManagementApp {
+    private static Scanner scanner = new Scanner(System.in);
+    private static DietPlan dietPlan = new DietPlan();
+    private static List<String> dailyLog = new ArrayList<>();
+
+    public static void main(String[] args) {
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.println("1. Add Meal");
+            System.out.println("2. Modify Meal");
+            System.out.println("3. Remove Meal");
+            System.out.println("4. View Diet Plan");
+            System.out.println("5. Track Daily Log");
+            System.out.println("6. View Daily Calorie Intake");
+            System.out.println("7. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addMeal();
+                    break;
+                case 2:
+                    modifyMeal();
+                    break;
+                case 3:
+                    removeMeal();
+                    break;
+                case 4:
+                    viewDietPlan();
+                    break;
+                case 5:
+                    trackDailyLog();
+                    break;
+                case 6:
+                    viewDailyCalorieIntake();
+                    break;
+                case 7:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+        scanner.close();
+    }
+
+    private static void addMeal() {
+        System.out.print("Enter meal name: ");
+        String mealName = scanner.next();
+        Meal meal = new Meal(mealName);
+
+        boolean addMoreFoods = true;
+
+        while (addMoreFoods) {
+            System.out.print("Enter food name: ");
+            String foodName = scanner.next();
+            System.out.print("Enter calories: ");
+            double calories = scanner.nextDouble();
+
+            Food food = new Food(foodName, calories);
+            meal.addFood(food);
+
+            System.out.print("Add more foods? (Y/N): ");
+            String choice = scanner.next();
+
+            if (choice.equalsIgnoreCase("N")) {
+                addMoreFoods = false;
+            }
+        }
+
+        dietPlan.addMeal(meal);
+        System.out.println("Meal added successfully!");
+    }
+
+    private static void modifyMeal() {
+        System.out.print("Enter the name of the meal to modify: ");
+        String mealName = scanner.next();
+
+        Meal selectedMeal = null;
+        List<Meal> meals = dietPlan.getMeals();
+
+        for (Meal meal : meals) {
+            if (meal.getName().equalsIgnoreCase(mealName)) {
+                selectedMeal = meal;
+                break;
+            }
+        }
+
+        if (selectedMeal == null) {
+            System.out.println("Meal not found.");
+            return;
+        }
+
+        boolean modifyFoods = true;
+
+        while (modifyFoods) {
+            System.out.println("1. Add Food");
+            System.out.println("2. Remove Food");
+            System.out.println("3. Back");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addFoodToMeal(selectedMeal);
+                    break;
+                case 2:
+                    removeFoodFromMeal(selectedMeal);
+                    break;
+                case 3:
+                    modifyFoods = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+        System.out.println("Meal modified successfully!");
+    }
+
+    private static void addFoodToMeal(Meal meal) {
+        System.out.print("Enter food name: ");
+        String foodName = scanner.next();
+        System.out.print("Enter calories: ");
+        double calories = scanner.nextDouble();
+
+        Food food = new Food(foodName, calories);
+        meal.addFood(food);
+
+        System.out.println("Food added successfully!");
+    }
+
+    private static void removeFoodFromMeal(Meal meal) {
+        System.out.print("Enter the name of the food to remove: ");
+        String foodName = scanner.next();
+
+        List<Food> foods = meal.getFoods();
+        Food selectedFood = null;
+
+        for (Food food : foods) {
+            if (food.getName().equalsIgnoreCase(foodName)) {
+                selectedFood = food;
+                break;
+            }
+        }
+
+        if (selectedFood != null) {
+            meal.removeFood(selectedFood);
+            System.out.println("Food removed successfully!");
+        } else {
+            System.out.println("Food not found.");
+        }
+    }
+
+    private static void removeMeal() {
+        System.out.print("Enter the name of the meal to remove: ");
+        String mealName = scanner.next();
+
+        List<Meal> meals = dietPlan.getMeals();
+        Meal selectedMeal = null;
+
+        for (Meal meal : meals) {
+            if (meal.getName().equalsIgnoreCase(mealName)) {
+                selectedMeal = meal;
+                break;
+            }
+        }
+
+        if (selectedMeal != null) {
+            dietPlan.removeMeal(selectedMeal);
+            System.out.println("Meal removed successfully!");
+        } else {
+            System.out.println("Meal not found.");
+        }
+    }
+
+    private static void viewDietPlan() {
+        System.out.println("\nDiet Plan:");
+        System.out.println("----------");
+
+        List<Meal> meals = dietPlan.getMeals();
+
+        for (Meal meal : meals) {
+            System.out.println(meal.getName() + ":");
+            System.out.println("Foods:");
+
+            List<Food> foods = meal.getFoods();
+
+            for (Food food : foods) {
+                System.out.println("- " + food.getName() + " (" + food.getCalories() + " calories)");
+            }
+
+            System.out.println();
+        }
+    }
+
+    private static void trackDailyLog() {
+        System.out.print("Enter the name of the meal consumed: ");
+        String mealName = scanner.next();
+        dailyLog.add(mealName);
+        System.out.println("Meal tracked successfully!");
+    }
+
+    private static void viewDailyCalorieIntake() {
+        double totalCalories = 0;
+
+        for (String mealName : dailyLog) {
+            for (Meal meal : dietPlan.getMeals()) {
+                if (meal.getName().equalsIgnoreCase(mealName)) {
+                    for (Food food : meal.getFoods()) {
+                        totalCalories += food.getCalories();
+                    }
+                    break;
+                }
+            }
+        }
+
+        System.out.println("Daily Calorie Intake: " + totalCalories + " calories");
+    }
+}
